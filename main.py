@@ -141,53 +141,32 @@ class AnalyzeResponse(BaseModel):
     wellness_tip: str
     burnout_risk: str = "Low"
 
-@app.post("/analyze", response_model=AnalyzeResponse)
-def analyze(req: AnalyzeRequest):
-    text = req.text or ""
-    user_id = req.user_id or "anonymous"
+@app.post("/analyze")
+async def analyze(request: AnalyzeRequest):
 
-    # 1) sentiment
-    score = sentiment_score(text)
-    stress_level = classify_stress(score)
+    text = request.text.lower()
 
-    # 2) prepare replies
-    if stress_level == "High":
-        emotion_reply = (
-            "😟 I notice you might be feeling stressed.\n"
-            "Try a 1-minute deep breathing exercise: Inhale 4s → Hold 4s → Exhale 4s."
-        )
-        wellness_tip = random.choice(WELLNESS_REMINDERS)
-    elif stress_level == "Medium":
-        emotion_reply = "😐 Thanks for sharing. Looks like today is an okay day."
-        wellness_tip = ""
+    # ========== SIMPLE RULE-BASED CHECK ==========
+    if "stress" in text or "tired" in text or "pressure" in text:
+        reply_text = "I notice you might be feeling stressed. Try a 1-minute deep breathing exercise: Inhale 4s • Hold 4s • Exhale 4s."
+        stress_level = "High"
+        confidence = 0.95
+        response_type = "emotion"
+
     else:
-        emotion_reply = "😊 I'm glad you're feeling good today!"
-        wellness_tip = ""
+        reply_text = "You're doing good! Let me know if you'd like help with something."
+        stress_level = "Low"
+        confidence = 0.85
+        response_type = "neutral"
 
-    learning_tip = random.choice(MICROLEARNING_TIPS)
-
-    # 3) burnout risk (simple rule)
-    burnout_risk = burnout_risk_for_user(user_id)
-
-    # 4) log to DB
-    try:
-        log_interaction(user_id, text, score, stress_level, learning_tip, wellness_tip)
-    except Exception as e:
-        # don't fail the request if logging fails
-        print("DB log error:", e)
-
-    # 5) form final reply
-    final_reply = f"{emotion_reply}\n\n{learning_tip}"
-    if wellness_tip:
-        final_reply += f"\n\nWellness Reminder: {wellness_tip}"
-
+    # ========== IMPORTANT: ZOHO-FRIENDLY RETURN ==========
     return {
-    "replies": [
-        {"text": reply_text}
-    ],
-    "stress_level": stress_level,
-    "score": confidence,
-    "type": response_type
+        "replies": [
+            { "text": reply_text }
+        ],
+        "stress_level": stress_level,
+        "score": confidence,
+        "type": response_type
     }
 
 
