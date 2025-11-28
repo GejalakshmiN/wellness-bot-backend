@@ -9,4 +9,3 @@ class AnalyzeResponse(BaseModel):
     stress_level: str
     score: float
     type: str
-
