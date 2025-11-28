@@ -43,12 +43,10 @@ async def analyze(req: AnalyzeRequest):
     # ZOHO REQUIRED FORMAT
     # -------------------------
     return {
-        "replies": [
-            {"text": reply}
-        ],
-        "stress_level": stress_level,
-        "score": score,
-        "type": msg_type
+    "reply_text": reply_text,         # instead of replies[0].text
+    "stress_level": stress_level,
+    "score": confidence,
+    "type": response_type
     }
 
 
