@@ -161,13 +161,12 @@ async def analyze(request: AnalyzeRequest):
 
     # ========== IMPORTANT: ZOHO-FRIENDLY RETURN ==========
     return {
-        "replies": [
-            { "text": reply_text }
-        ],
-        "stress_level": stress_level,
-        "score": confidence,
-        "type": response_type
-    }
+    "reply_text": reply_text,
+    "stress_level": stress_level,
+    "score": confidence,
+    "type": response_type
+}
+
 
 
 # -------------------------
