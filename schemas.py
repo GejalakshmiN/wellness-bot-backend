@@ -5,7 +5,8 @@ class AnalyzeRequest(BaseModel):
     user_id: str
 
 class AnalyzeResponse(BaseModel):
-    reply: str
+    replies: list
     stress_level: str
     score: float
-    type: str  # "learning" or "emotion"
+    type: str
+
