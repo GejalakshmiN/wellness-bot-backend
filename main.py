@@ -181,14 +181,15 @@ def analyze(req: AnalyzeRequest):
     if wellness_tip:
         final_reply += f"\n\nWellness Reminder: {wellness_tip}"
 
-    return AnalyzeResponse(
-        reply=final_reply,
-        score=score,
-        stress_level=stress_level,
-        learning_tip=learning_tip,
-        wellness_tip=wellness_tip,
-        burnout_risk=burnout_risk
-    )
+    return {
+    "replies": [
+        {"text": reply_text}
+    ],
+    "stress_level": stress_level,
+    "score": confidence,
+    "type": response_type
+    }
+
 
 # -------------------------
 # Analytics endpoints
